@@ -15,13 +15,13 @@ def get_message():
 @client.event
 async def on_ready():
     guild = discord.utils.get(client.guilds, name=GUILD)
-    print('{client.user} is connected to: {guild.name}(id: {guild.id}).')
+    print(f'{client.user} is connected to: {guild.name}(id: {guild.id}).')
 
     # weather-bot channel
     channel = client.get_channel(CHANNEL)
 
     msg = get_message()
     await channel.send(msg)
-    print('Sent: %s using %s.' % (msg, CHANNEL))
+    print(f'Sent: \'{msg}\' using channel id: {CHANNEL}.')
 
 client.run(TOKEN)
