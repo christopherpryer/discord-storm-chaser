@@ -22,9 +22,11 @@ def get_forecast(city, state, days):
 
 def get_message(search_str, forecast):
     now = datetime.now()
-    msg_base = 'day: %s\nhigh: %s\nlow: %s\nwind speed: %s\ndesc: %s\n'
-    msg_li = [msg_base % (i+1, d['high_temp'], d['low_temp'], d['wind_spd'],
-        d['weather']['description']) for i, d in enumerate(forecast)]
+    msg_base = \
+        'day: %s\ntemp: %s\thi: %s\tlo: %s\nsnow: %s\tdepth: %s\ndesc: %s\n'
+    msg_li = [msg_base % (i+1, d['temp'], d['high_temp'], d['low_temp'],
+        d['snow'], d['snow_depth'], d['weather']['description'])
+        for i, d in enumerate(forecast)]
     return '[%s] Search: %s\n%s' % (now, search_str, '\n'.join(msg_li))
 
 @client.event
@@ -41,7 +43,7 @@ async def on_ready():
     search_str = f'{city}, {state}, {days}-day'
     msg = get_message(search_str, forecast)
     await channel.send(msg)
-    print(f'Sent to channel: {channel}.')
+    print(f'Sent forecast to channel: {channel}.')
 
 
 if __name__ == '__main__':
