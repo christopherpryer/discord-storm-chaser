@@ -30,8 +30,8 @@ def mmtin(mm):
     return round(float(mm)/25.4, 2)
 
 def get_message(search_str, forecast):
-    msg_base = ('**day:** %s\n**temp:** %s F\t**hi:** %s F\t**lo:** %s F'
-        '\n**snow:** %s in\t**depth:** %s in\n**desc:** %s\n')
+    msg_base = ('**Day:** %s\n**Temp:** %s F\t**Hi:** %s F\t**Lo:** %s F'
+        '\n**Snow:** %s in\t**Depth:** %s in\n**Desc:** %s\n')
     msg_li = [msg_base % (i+1, ctf(d['temp']), ctf(d['high_temp']),
         ctf(d['low_temp']), mmtin(d['snow']), mmtin(d['snow_depth']),
         d['weather']['description']) for i, d in enumerate(forecast)]
