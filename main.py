@@ -1,6 +1,7 @@
 import os
-import discord
+
 from dotenv import load_dotenv
+import discord
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -24,4 +25,6 @@ async def on_ready():
     await channel.send(msg)
     print(f'Sent: \'{msg}\' using channel id: {CHANNEL}.')
 
-client.run(TOKEN)
+
+if __name__ == '__main__':
+    client.run(TOKEN)
