@@ -20,6 +20,7 @@ def test_city_search():
 
     data = json.loads(response.text)
     print('DATA:', data)
+    return data
 
 if __name__ == '__main__':
-    test_city_search()
+    data = test_city_search()
