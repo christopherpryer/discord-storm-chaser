@@ -20,13 +20,21 @@ def get_forecast(city, state, days):
     response = requests.get(endpoint+q_str)
     return json.loads(response.text)['data']
 
+def ctf(c):
+    """returns fahrenheit from celsius"""
+    return round((float(c)*(9/5) + 32), 2)
+
+def mmtin(mm):
+    """returns inches from mm"""
+    return round(float(mm)/25.4, 2)
+
 def get_message(search_str, forecast):
     now = datetime.now()
-    msg_base = \
-        'day: %s\ntemp: %s\thi: %s\tlo: %s\nsnow: %s\tdepth: %s\ndesc: %s\n'
-    msg_li = [msg_base % (i+1, d['temp'], d['high_temp'], d['low_temp'],
-        d['snow'], d['snow_depth'], d['weather']['description'])
-        for i, d in enumerate(forecast)]
+    msg_base = ('day: %s\ntemp: %s F\thi: %s F\tlo: %s F'
+        '\nsnow: %s in\tdepth: %s in\ndesc: %s\n')
+    msg_li = [msg_base % (i+1, ctf(d['temp']), ctf(d['high_temp']),
+        ctf(d['low_temp']), mmtin(d['snow']), mmtin(d['snow_depth']),
+        d['weather']['description']) for i, d in enumerate(forecast)]
     return '[%s] Search: %s\n%s' % (now, search_str, '\n'.join(msg_li))
 
 @client.event
@@ -43,7 +51,7 @@ async def on_ready():
     search_str = f'{city}, {state}, {days}-day'
     msg = get_message(search_str, forecast)
     await channel.send(msg)
-    print(f'Sent forecast to channel: {channel}.')
+    print(f'Sent {search_str} forecast to channel: {channel}.')
 
 
 if __name__ == '__main__':
