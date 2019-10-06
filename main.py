@@ -5,6 +5,7 @@ from datetime import datetime
 
 from dotenv import load_dotenv
 import discord
+from coordinates import coordinates
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -14,9 +15,9 @@ API_KEY = os.getenv('API_KEY') # weatherbit api key
 
 client = discord.Client()
 
-def get_forecast(city, state, days):
+def get_forecast(lat, lon, days):
     endpoint = 'http://api.weatherbit.io/v2.0/forecast/daily?'
-    q_str = f'city={city},{state}&days={days}&key={API_KEY}'
+    q_str = f'lat={lat}&lon={lon}&days={days}&key={API_KEY}'
     response = requests.get(endpoint+q_str)
     return json.loads(response.text)['data']
 
@@ -29,13 +30,12 @@ def mmtin(mm):
     return round(float(mm)/25.4, 2)
 
 def get_message(search_str, forecast):
-    now = datetime.now()
-    msg_base = ('day: %s\ntemp: %s F\thi: %s F\tlo: %s F'
-        '\nsnow: %s in\tdepth: %s in\ndesc: %s\n')
+    msg_base = ('**day:** %s\n**temp:** %s F\t**hi:** %s F\t**lo:** %s F'
+        '\n**snow:** %s in\t**depth:** %s in\n**desc:** %s\n')
     msg_li = [msg_base % (i+1, ctf(d['temp']), ctf(d['high_temp']),
         ctf(d['low_temp']), mmtin(d['snow']), mmtin(d['snow_depth']),
         d['weather']['description']) for i, d in enumerate(forecast)]
-    return '[%s] Search: %s\n%s' % (now, search_str, '\n'.join(msg_li))
+    return '**_**\n**Search:** %s\n%s' % (search_str, '\n'.join(msg_li))
 
 @client.event
 async def on_ready():
@@ -44,14 +44,16 @@ async def on_ready():
 
     # weather-bot channel
     channel = client.get_channel(CHANNEL)
-    city = 'Stowe'
-    state = 'VT'
-    days = 10
-    forecast = get_forecast(city, state, days)
-    search_str = f'{city}, {state}, {days}-day'
-    msg = get_message(search_str, forecast)
-    await channel.send(msg)
-    print(f'Sent {search_str} forecast to channel: {channel}.')
+    for geo in coordinates:
+        lat = geo['lat']
+        lon = geo['lat']
+        days = 1
+        forecast = get_forecast(lat, lon, days)
+        mtn = geo['mtn']
+        search_str = f'{mtn}, {days}-day'
+        msg = get_message(search_str, forecast)
+        await channel.send(msg)
+        print(f'Sent {search_str} forecast to channel: {channel}.')
 
 
 if __name__ == '__main__':
