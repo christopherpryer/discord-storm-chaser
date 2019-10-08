@@ -12,3 +12,6 @@ coordinates = [
 {'lat': 39.758995, 'lon': -77.368938, 'mtn': 'Liberty, PA'},
 {'lat': 39.742025, 'lon': -77.935373, 'mtn': 'Whitetail, PA'},
 {'lat': 40.106815, 'lon': -76.925932, 'mtn': 'Roundtop, PA'}]
+
+lookup = \
+    {c['mtn'].upper(): {'lat': c['lat'], 'lon': c['lon']} for c in coordinates}
