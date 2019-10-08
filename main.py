@@ -31,13 +31,14 @@ def mmtin(mm):
     """returns inches from mm"""
     return round(float(mm)/25.4, 2)
 
-def next_day(d):
-    return (datetime.now() + timedelta(days=d)).strftime('%d/%m/%y')
+def next_day(now, d):
+    return (now + timedelta(days=d)).strftime('%m/%d/%y')
 
 def get_message(search_str, forecast):
-    msg_base = ('**Day:** %s\n**Temp:** %s F\t**Hi:** %s F\t**Lo:** %s F'
+    now = datetime.now()
+    msg_base = ('**Date:** %s\n**Temp:** %s F\t**Hi:** %s F\t**Lo:** %s F'
         '\n**Snow:** %s in\t**Depth:** %s in\n**Desc:** %s\n')
-    msg_li = [msg_base % (next_day(i+1), ctf(d['temp']),
+    msg_li = [msg_base % (next_day(now, i+1), ctf(d['temp']),
         ctf(d['high_temp']), ctf(d['low_temp']), mmtin(d['snow']),
         mmtin(d['snow_depth']),
         d['weather']['description']) for i, d in enumerate(forecast)]
