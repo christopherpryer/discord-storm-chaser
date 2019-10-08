@@ -1,7 +1,7 @@
 import requests
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 import traceback
 from dotenv import load_dotenv
 import discord
@@ -31,11 +31,15 @@ def mmtin(mm):
     """returns inches from mm"""
     return round(float(mm)/25.4, 2)
 
+def next_day(d):
+    return (datetime.now() + timedelta(days=d)).strftime('%d/%m/%y')
+
 def get_message(search_str, forecast):
     msg_base = ('**Day:** %s\n**Temp:** %s F\t**Hi:** %s F\t**Lo:** %s F'
         '\n**Snow:** %s in\t**Depth:** %s in\n**Desc:** %s\n')
-    msg_li = [msg_base % (i+1, ctf(d['temp']), ctf(d['high_temp']),
-        ctf(d['low_temp']), mmtin(d['snow']), mmtin(d['snow_depth']),
+    msg_li = [msg_base % (next_day(i+1), ctf(d['temp']),
+        ctf(d['high_temp']), ctf(d['low_temp']), mmtin(d['snow']),
+        mmtin(d['snow_depth']),
         d['weather']['description']) for i, d in enumerate(forecast)]
     return '**_**\n**Search:** %s\n%s' % (search_str, '\n'.join(msg_li))
 
@@ -70,7 +74,7 @@ async def on_message(message):
                 '\n`days options`: %s ' \
                 '\n`example command`: \'jfbb, pa 5\''
             msg = e % (message.author, cmd_str,
-                [l.lower()+' [days]' for l in list(lookup)], list(range(1, 17)))
+                [l.lower()+' [days]' for l in list(lookup)], list(range(1, 16)))
             traceback.print_exc()
 
         await channel.send(msg)
