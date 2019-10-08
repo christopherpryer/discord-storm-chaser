@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 import traceback
 from dotenv import load_dotenv
 import discord
-from discord.ext import commands
 from coordinates import *
 
 load_dotenv()
@@ -15,7 +14,6 @@ CHANNEL = int(os.getenv('DISCORD_CHANNEL'))
 API_KEY = os.getenv('API_KEY') # weatherbit api key
 
 client = discord.Client()
-bot = commands.Bot(command_prefix='!weather')
 
 def get_forecast(lat, lon, days):
     endpoint = 'http://api.weatherbit.io/v2.0/forecast/daily?'
