@@ -36,7 +36,7 @@ def get_message(search_str, forecast):
     now = datetime.now()
     msg_base = ('**Date:** %s\t**Temp:** %s F'
         '\n**Snow:** %s in\t**Depth:** %s in\n**Desc:** %s\n')
-    msg_li = [msg_base % (next_day(now, i+1), ctf(d['temp']), mmtin(d['snow']),
+    msg_li = [msg_base % (next_day(now, i), ctf(d['temp']), mmtin(d['snow']),
         mmtin(d['snow_depth']),
         d['weather']['description']) for i, d in enumerate(forecast)]
     return '**_**\n**Search:** %s\n%s' % (search_str, '\n'.join(msg_li))
