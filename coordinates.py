@@ -11,7 +11,10 @@ coordinates = [
 {'lat': 43.321843, 'lon': -72.071415, 'mtn': 'Mt Sunapee, NH'},
 {'lat': 39.758995, 'lon': -77.368938, 'mtn': 'Liberty, PA'},
 {'lat': 39.742025, 'lon': -77.935373, 'mtn': 'Whitetail, PA'},
-{'lat': 40.106815, 'lon': -76.925932, 'mtn': 'Roundtop, PA'}]
+{'lat': 40.106815, 'lon': -76.925932, 'mtn': 'Roundtop, PA'},
+{'lat': 39.471854, 'lon': -106.079110, 'mtn': 'Breck, CO'},
+{'lat': 39.579715, 'lon': -105.941400, 'mtn': 'Keystone, CO'},
+{'lat': 50.085187, 'lon': -122.896886, 'mtn': 'Whistler, BC'}]
 
 lookup = \
     {c['mtn'].upper(): {'lat': c['lat'], 'lon': c['lon']} for c in coordinates}
