@@ -39,22 +39,19 @@ def next_day(now, d):
 
 def get_message(search_str, forecast):
     now = datetime.now()
-    msg_base = (
-        "**Date:** %s\t**Temp:** %s F"
-        "\n**Snow:** %s in\t**Depth:** %s in\n**Desc:** %s\n"
-    )
+
     msg_li = [
-        msg_base
-        % (
-            next_day(now, i),
-            ctf(d["temp"]),
-            mmtin(d["snow"]),
-            mmtin(d["snow_depth"]),
-            d["weather"]["description"],
+        "\n".join(
+            [
+                f"**Date:** {next_day(now, i)}",
+                f"**Info:** {d['weather']['description']}",
+                f":thermometer: {ctf(d['temp'])} F :snowflake: {mmtin(d['snow'])} in :mount_fuji: {mmtin(d['snow_depth'])} in",
+            ]
         )
         for i, d in enumerate(forecast)
     ]
-    return "**_**\n**Search:** %s\n%s" % (search_str, "\n".join(msg_li))
+
+    return "\n**Search:** %s\n\n%s" % (search_str, "\n\n".join(msg_li))
 
 
 @client.event
@@ -65,7 +62,7 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    if message.content.startswith("!weather "):
+    if message.content.startswith("!weather"):
         cmd_str = message.content[9:]
         args = [" ".join(cmd_str.split(" ")[:-1]), cmd_str.split(" ")[-1]]
         key = args[0].upper()
