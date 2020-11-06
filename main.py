@@ -6,6 +6,7 @@ import traceback
 from dotenv import load_dotenv
 import discord
 from coordinates import *
+from typing import Dict, List
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
@@ -43,15 +44,46 @@ def get_message(search_str, forecast):
     msg_li = [
         "\n".join(
             [
-                f"**Date:** {next_day(now, i)}",
-                f"**Info:** {d['weather']['description']}",
-                f":thermometer: {ctf(d['temp'])} F :snowflake: {mmtin(d['snow'])} in :mount_fuji: {mmtin(d['snow_depth'])} in",
+                f":calendar: **{next_day(now, i)}**  |    "
+                f":thermometer: {ctf(d['temp'])} F, :snowflake: {mmtin(d['snow'])}"
+                f" in, :mount_fuji: {mmtin(d['snow_depth'])} in, "
+                f":notepad_spiral: {d['weather']['description']}",
             ]
         )
         for i, d in enumerate(forecast)
     ]
 
-    return "\n**Search:** %s\n\n%s" % (search_str, "\n\n".join(msg_li))
+    return "\n>> **Search:** %s\n\n%s" % (search_str, "\n".join(msg_li))
+
+
+def search_lookup_keys(search_str: str) -> str:
+    """returns best search result"""
+    for k in LOOKUP.keys():
+        if search_str in k:
+
+            return k
+
+    return search_str
+
+
+def parse_days_from_args_remove(args: List[str]) -> (str, List[str]):
+
+    if args[-1] in ["d", "day", "days"]:
+        return args[-2], args[:-2]
+
+    elif args[-1].lower().endswith("d"):
+        return args[-1][:-1], args[:-1]
+
+    elif args[-1].lower().endswith("day"):
+        return args[-1][:-3], args[:-1]
+
+    elif args[-1].lower().endswith("-day"):
+        return args[-1][:-4], args[:-1]
+
+    elif args[-1].isdigit():
+        return args[-1], args[:-1]
+
+    return 3, args
 
 
 @client.event
@@ -62,21 +94,26 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    if message.content.startswith("!weather"):
-        cmd_str = message.content[9:]
-        args = [" ".join(cmd_str.split(" ")[:-1]), cmd_str.split(" ")[-1]]
-        key = args[0].upper()
+    if message.content.startswith("!weather ") or message.content.startswith("!w "):
+        cmd_str = (
+            message.content.replace("!weather", "")
+            .replace("!w", "")
+            .replace(",", "")
+            .strip()
+        )
+        args = cmd_str.split(" ")  # consider each space end of arg position
+        days, args = parse_days_from_args_remove(args)
+
+        key = " ".join(args)
         msg = ""
 
         # weather-bot channel
         channel = client.get_channel(CHANNEL)
         try:
-            lat = lookup[key]["lat"]
-            lon = lookup[key]["lon"]
-            days = int(args[1])
+            lat = LOOKUP[search_lookup_keys(key)]["lat"]
+            lon = LOOKUP[search_lookup_keys(key)]["lon"]
             forecast = get_forecast(lat, lon, days)
-            search_str = f"{args[0]}, {args[1]}-day"
-            msg = get_message(search_str, forecast)
+            msg = get_message(key, forecast)
         except:
             e = (
                 "**Error. Please try again.**"
@@ -89,7 +126,7 @@ async def on_message(message):
             msg = e % (
                 message.author,
                 cmd_str,
-                [l.lower() + " [days]" for l in list(lookup)],
+                [l.lower() + " [days]" for l in list(LOOKUP)],
                 list(range(1, 17)),
             )
             traceback.print_exc()
