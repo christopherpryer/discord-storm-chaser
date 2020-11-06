@@ -44,7 +44,7 @@ def get_message(search_str, forecast):
     msg_li = [
         "\n".join(
             [
-                f":calendar: **{next_day(now, i)}**  |    "
+                f":calendar: **{next_day(now, i)}**    "
                 f":thermometer: {ctf(d['temp'])} F, :snowflake: {mmtin(d['snow'])}"
                 f" in, :mount_fuji: {mmtin(d['snow_depth'])} in, "
                 f":notepad_spiral: {d['weather']['description']}",
@@ -68,22 +68,25 @@ def search_lookup_keys(search_str: str) -> str:
 
 def parse_days_from_args_remove(args: List[str]) -> (str, List[str]):
 
+    days = 3 # default days = 3
+    new_args = args
+
     if args[-1] in ["d", "day", "days"]:
-        return args[-2], args[:-2]
+        days, new_args = args[-2], args[:-2]
 
     elif args[-1].lower().endswith("d"):
-        return args[-1][:-1], args[:-1]
-
-    elif args[-1].lower().endswith("day"):
-        return args[-1][:-3], args[:-1]
+        days, new_args = args[-1][:-1], args[:-1]
 
     elif args[-1].lower().endswith("-day"):
-        return args[-1][:-4], args[:-1]
+        days, new_args = args[-1][:-4], args[:-1]
+
+    elif args[-1].lower().endswith("day"):
+        days, new_args = args[-1][:-3], args[:-1]
 
     elif args[-1].isdigit():
-        return args[-1], args[:-1]
+        days, new_args = args[-1], args[:-1]
 
-    return 3, args
+    return int(days), new_args
 
 
 @client.event
