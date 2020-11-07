@@ -1,4 +1,4 @@
-# discord-storm-chaser
+# discord-stormchaser
 Discord bot to assist with storm-chasing for skiers and snowboarders.
 
 
