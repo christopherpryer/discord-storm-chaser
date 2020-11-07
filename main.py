@@ -138,7 +138,7 @@ def handle_exception(msg: object) -> str:
     msg = e % (
         msg.author,
         msg.content,
-        [l.lower() + " [days]" for l in list(LOOKUP)],
+        [_.lower() + " [days]" for _ in list(LOOKUP)],
         list(range(1, 17)),
     )
 
@@ -150,7 +150,12 @@ def handle_exception(msg: object) -> str:
 @client.event
 async def on_message(message):
     if message.content.startswith("!weather ") or message.content.startswith("!w "):
-        inputs = create_inputs_from_discord_msg(message)
+
+        try:
+            inputs = create_inputs_from_discord_msg(message)
+        
+        except:
+            fmsg = handle_exception(message)
 
         # weather-bot channel
         channel = client.get_channel(CHANNEL)
