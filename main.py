@@ -21,6 +21,7 @@ def get_forecast(lat, lon, days):
     endpoint = "http://api.weatherbit.io/v2.0/forecast/daily?"
     q_str = f"lat={lat}&lon={lon}&days={days}&key={API_KEY}"
     response = requests.get(endpoint + q_str)
+
     return json.loads(response.text)["data"]
 
 
@@ -68,7 +69,7 @@ def search_lookup_keys(search_str: str) -> str:
 
 def parse_days_from_args_remove(args: List[str]) -> (str, List[str]):
 
-    days = 3 # default days = 3
+    days = 3  # default days = 3
     new_args = args
 
     if args[-1] in ["d", "day", "days"]:
