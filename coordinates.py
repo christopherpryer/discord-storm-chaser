@@ -11,7 +11,7 @@ COORDINATES = [
     {"lat": 44.924510, "lon": -72.523740, "mtn": "jay vt"},
     {"lat": 44.070258, "lon": -71.222398, "mtn": "attitash nh"},
     {"lat": 43.005875, "lon": -71.879827, "mtn": "crotched nh"},
-    {"lat": 44.250096, "lon": -71.219147, "mtn": "wildcat, nh"},
+    {"lat": 44.250096, "lon": -71.219147, "mtn": "wildcat nh"},
     {"lat": 43.321843, "lon": -72.071415, "mtn": "mt sunapee nh"},
     {"lat": 39.758995, "lon": -77.368938, "mtn": "liberty pa"},
     {"lat": 39.742025, "lon": -77.935373, "mtn": "whitetail pa"},
