@@ -9,62 +9,70 @@ from coordinates import *
 from typing import Dict, List
 
 load_dotenv()
+
+
 TOKEN = os.getenv("DISCORD_TOKEN")
 GUILD = os.getenv("DISCORD_GUILD")
 CHANNEL = int(os.getenv("DISCORD_CHANNEL"))
 API_KEY = os.getenv("API_KEY")  # weatherbit api key TODO: rename, dingus
 
+
 client = discord.Client()
 
 
-def get_forecast(lat, lon, days):
-    endpoint = "http://api.weatherbit.io/v2.0/forecast/daily?"
-    q_str = f"lat={lat}&lon={lon}&days={days}&key={API_KEY}"
-    response = requests.get(endpoint + q_str)
+def get_forecast(lat: float, lon: float, days: int) -> object:
+    lat = str(lat)
+    lat = str(lon)
+    lat = str(days)
 
-    return json.loads(response.text)["data"]
+    response = requests.get(
+        "http://api.weatherbit.io/v2.0/forecast/daily?"
+        f"lat={lat}&lon={lon}&days={days}&key={API_KEY}"
+    )
+    forecast = json.loads(response.text)["data"]
+
+    return forecast
 
 
-def ctf(c):
+def celsius_to_fahrenheit(c: float) -> float:
     """returns fahrenheit from celsius"""
     return round((float(c) * (9 / 5) + 32), 2)
 
 
-def mmtin(mm):
+def millimeters_to_inches(mm: float) -> float:
     """returns inches from mm"""
     return round(float(mm) / 25.4, 2)
 
 
-def next_day(now, d):
+def day_to_next_day(now: str, d: int) -> str:
     return (now + timedelta(days=d)).strftime("%m/%d/%y")
 
 
-def get_message(search_str, forecast):
-    now = datetime.now()
-
+def create_msg(search: str, forecast: list) -> str:
     msg_li = [
         "\n".join(
             [
-                f":calendar: **{next_day(now, i)}**    "
-                f":thermometer: {ctf(d['temp'])} F, :snowflake: {mmtin(d['snow'])}"
-                f" in, :mount_fuji: {mmtin(d['snow_depth'])} in, "
+                f":calendar: **{day_to_next_day(datetime.now(), i)}**    "
+                f":thermometer: {celsius_to_fahrenheit(d['temp'])} F, "
+                f":snowflake: {millimeters_to_inches(d['snow'])} "
+                f"in, :mount_fuji: {millimeters_to_inches(d['snow_depth'])} in, "
                 f":notepad_spiral: {d['weather']['description']}",
             ]
         )
         for i, d in enumerate(forecast)
     ]
 
-    return "\n>> **Search:** %s\n\n%s" % (search_str, "\n".join(msg_li))
+    return "\n>> **Search:** %s\n\n%s" % (search, "\n".join(msg_li))
 
 
-def search_lookup_keys(search_str: str) -> str:
+def search_lookup_keys(search: str) -> str:
     """returns best search result"""
     for k in LOOKUP.keys():
-        if search_str in k:
+        if search in k:
 
             return k
 
-    return search_str
+    return search
 
 
 def parse_days_from_args_remove(args: List[str]) -> (str, List[str]):
@@ -96,47 +104,69 @@ async def on_ready():
     print(f"{client.user} is running")
 
 
+def parse_discord_msg_for_args(msg: object) -> List[str]:
+    args = (
+        msg.content.replace("!weather", "")
+        .replace("!w", "")
+        .replace(",", "")
+        .strip()
+        .split(" ")  # consider each space end of arg position
+    )
+
+    return args
+
+
+def create_inputs_from_discord_msg(msg: object) -> dict:
+    args = parse_discord_msg_for_args(msg)
+    days, args = parse_days_from_args_remove(args)
+    search = " ".join(args)
+    inputs = {"search": search, "days": days, "args": args}
+
+    return inputs
+
+
+def handle_exception(msg: object) -> str:
+    e = (
+        "**Error. Please try again.**"
+        "\n`user`: %s"
+        "\n`failed command`: '%s'"
+        "\n`allowed commands`: %s"
+        "\n`days options`: %s "
+        "\n`example command`: 'jfbb, pa 5'"
+    )
+
+    msg = e % (
+        msg.author,
+        msg.content,
+        [l.lower() + " [days]" for l in list(LOOKUP)],
+        list(range(1, 17)),
+    )
+
+    traceback.print_exc()
+
+    return msg
+
+
 @client.event
 async def on_message(message):
     if message.content.startswith("!weather ") or message.content.startswith("!w "):
-        cmd_str = (
-            message.content.replace("!weather", "")
-            .replace("!w", "")
-            .replace(",", "")
-            .strip()
-        )
-        args = cmd_str.split(" ")  # consider each space end of arg position
-        days, args = parse_days_from_args_remove(args)
-
-        key = " ".join(args)
-        msg = ""
+        inputs = create_inputs_from_discord_msg(message)
 
         # weather-bot channel
         channel = client.get_channel(CHANNEL)
-        try:
-            lat = LOOKUP[search_lookup_keys(key)]["lat"]
-            lon = LOOKUP[search_lookup_keys(key)]["lon"]
-            forecast = get_forecast(lat, lon, days)
-            msg = get_message(key, forecast)
-        except:
-            e = (
-                "**Error. Please try again.**"
-                "\n`user`: %s"
-                "\n`failed command`: '%s'"
-                "\n`allowed commands`: %s"
-                "\n`days options`: %s "
-                "\n`example command`: 'jfbb, pa 5'"
-            )
-            msg = e % (
-                message.author,
-                cmd_str,
-                [l.lower() + " [days]" for l in list(LOOKUP)],
-                list(range(1, 17)),
-            )
-            traceback.print_exc()
 
-        await channel.send(msg)
-        print(f"Responded to '{cmd_str}' in channel: {channel}.")
+        try:
+            lat = LOOKUP[search_lookup_keys(inputs["search"])]["lat"]
+            lon = LOOKUP[search_lookup_keys(inputs["search"])]["lon"]
+            forecast = get_forecast(lat, lon, inputs["days"])
+            fmsg = create_msg(inputs["search"], forecast)
+
+        except:
+            fmsg = handle_exception(message)
+
+        await channel.send(fmsg)
+
+        print(f"Responded to '{message.content}' in channel: {channel}.")
 
 
 if __name__ == "__main__":
