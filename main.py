@@ -80,6 +80,9 @@ def parse_days_from_args_remove(args: List[str]) -> (str, List[str]):
     days = 3  # default days = 3
     new_args = args
 
+    if len(args):
+        return int(days), new_args
+
     if args[-1] in ["d", "day", "days"]:
         days, new_args = args[-2], args[:-2]
 
@@ -104,10 +107,10 @@ async def on_ready():
     print(f"{client.user} is running")
 
 
-def parse_discord_msg_for_args(msg: object) -> List[str]:
+def parse_msg_args(msg: object) -> List[str]:
     args = (
-        msg.content.replace("!weather", "")
-        .replace("!w", "")
+        msg.content.replace("!forecast", "")
+        .replace("!f", "")
         .replace(",", "")
         .strip()
         .split(" ")  # consider each space end of arg position
@@ -117,7 +120,7 @@ def parse_discord_msg_for_args(msg: object) -> List[str]:
 
 
 def parse_msg_inputs(msg: object) -> dict:
-    args = parse_discord_msg_for_args(msg)
+    args = parse_msg_args(msg)
     days, args = parse_days_from_args_remove(args)
     search = " ".join(args)
     inputs = {"search": search, "days": days, "args": args}
@@ -149,7 +152,7 @@ def handle_exception(msg: object) -> str:
 
 @client.event
 async def on_message(message):
-    if message.content.startswith("!weather ") or message.content.startswith("!w "):
+    if message.content.startswith("!forecast ") or message.content.startswith("!f "):
 
         try:
             inputs = parse_msg_inputs(message)
