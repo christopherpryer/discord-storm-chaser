@@ -116,7 +116,7 @@ def parse_discord_msg_for_args(msg: object) -> List[str]:
     return args
 
 
-def create_inputs_from_discord_msg(msg: object) -> dict:
+def parse_msg_inputs(msg: object) -> dict:
     args = parse_discord_msg_for_args(msg)
     days, args = parse_days_from_args_remove(args)
     search = " ".join(args)
@@ -152,7 +152,7 @@ async def on_message(message):
     if message.content.startswith("!weather ") or message.content.startswith("!w "):
 
         try:
-            inputs = create_inputs_from_discord_msg(message)
+            inputs = parse_msg_inputs(message)
         
         except:
             fmsg = handle_exception(message)
