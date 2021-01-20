@@ -33,3 +33,7 @@ Run `python -m venv venv` and activate the `venv` using `source venv/scripts/act
 ## run the bot :rocket:
 
 `python main.py`
+
+## commands ⌨️
+
+To get the 10d forecast for Windham Mountain in NY type `!weather windham ny 10d` in the bot's discord channel. (`!weather` or `!w`)
