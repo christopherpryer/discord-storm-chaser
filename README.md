@@ -15,7 +15,7 @@ Go to [discord dev](https://discord.com/developers/applications/) prepare your b
 
 ## run the bot :rocket:
 
-Build using `go build src/main.go`
+Build using `go build`
 
 Then run `discord-stormchaser.exe -token="your discord auth token" -guild="your guild id" -weather-api-key="api key"`
 

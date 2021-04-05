@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	commands = []*discordgo.ApplicationCommand{
+	Commands = []*discordgo.ApplicationCommand{
 		{
 			Name:        "weather",
 			Description: "Weather API command",
@@ -59,7 +59,7 @@ var (
 			},
 		},
 	}
-	commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
+	CommandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
 		"weather": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 			margs := []interface{}{
 				i.Data.Options[0].StringValue(),
