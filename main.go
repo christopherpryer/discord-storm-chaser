@@ -7,7 +7,7 @@ import (
 	"os/signal"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/cnpls/discord-stormchaser/commands"
+	"github.com/cnpls/discord-stormchaser/weather"
 )
 
 // Bot parameters
@@ -30,7 +30,7 @@ func init() {
 	}
 
 	s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		if h, ok := commands.CommandHandlers[i.Data.Name]; ok {
+		if h, ok := weather.CommandHandlers[i.Data.Name]; ok {
 			h(s, i)
 		}
 	})
@@ -45,7 +45,7 @@ func main() {
 		log.Fatalf("Cannot open the session: %v", err)
 	}
 
-	for _, v := range commands.Commands {
+	for _, v := range weather.Commands {
 		_, err := s.ApplicationCommandCreate(s.State.User.ID, *GuildID, v)
 		if err != nil {
 			log.Panicf("Cannot create '%v' command: %v", v.Name, err)
