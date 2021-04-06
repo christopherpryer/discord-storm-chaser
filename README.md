@@ -1,3 +1,5 @@
+This project is under development.
+
 # discord-stormchaser
 Discord bot to assist with storm-chasing for skiers and snowboarders.
 
